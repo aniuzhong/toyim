@@ -1,3 +1,6 @@
 *.swp
 .vscode
 build
+src
+doc
+CMakeLists.txt
