@@ -1,0 +1,11 @@
+add_executable(user_model_test user_model_test.cc)
+target_link_libraries(user_model_test toyim_orm)
+
+add_executable(group_model_test group_model_test.cc)
+target_link_libraries(group_model_test toyim_orm)
+
+add_executable(friend_model_test friend_model_test.cc)
+target_link_libraries(friend_model_test toyim_orm)
+
+add_executable(offline_message_model_test offline_message_model_test.cc)
+target_link_libraries(offline_message_model_test toyim_orm)

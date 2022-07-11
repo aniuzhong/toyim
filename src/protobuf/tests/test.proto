@@ -1,0 +1,14 @@
+package toyim;
+
+message LoginRequest {
+  required int32 id = 1;
+  required string password = 2;
+}
+
+message LoginResponse {
+  required int32 status_code = 1;
+}
+
+message Empty {
+  optional int32 id = 1;
+}

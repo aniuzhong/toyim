@@ -1,0 +1,52 @@
+package toyim;
+
+message Register {
+  required string name = 1;
+  required string password = 2;
+}
+
+message Login {
+  required int32 id = 1;
+  required string password = 2;
+}
+
+message Logout {
+  required int32 id = 1;
+}
+
+message AddFriend {
+  required int32 user_id = 1;
+  required int32 friend_id = 2;
+}
+
+message FriendChat {
+  required int32 from = 1;
+  required int32 to = 2;
+  required string content = 3;
+}
+
+message CreateGroup {
+  required int32 user_id = 1;
+  required int32 group_id = 2;
+  required string group_name = 3;
+  required string descriptions = 4;
+}
+
+message AddGroup {
+  required int32 user_id = 1;
+  required int32 group_id = 2;
+}
+
+message GroupChat {
+  required int32 user_id = 1;
+  required int32 group_id = 2;
+  required string content = 3;
+}
+
+message Answer {
+  optional string reply = 1;
+}
+
+message Empty {
+  optional int32 id = 1;
+}

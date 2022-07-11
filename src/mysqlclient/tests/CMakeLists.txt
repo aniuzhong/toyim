@@ -1,0 +1,5 @@
+add_executable(connection_test connection_test.cc)
+target_link_libraries(connection_test toyim_mysqlclient)
+
+add_executable(connection_pool_test connection_pool_test.cc)
+target_link_libraries(connection_pool_test toyim_mysqlclient)
