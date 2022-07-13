@@ -5,11 +5,16 @@
 using toyim::orm::User;
 using toyim::orm::UserModel;
 
+void InsertOneUser(int user_num) {
+  std::string user_name("User" + std::to_string(user_num));
+  UserModel::Insert({-1, user_name, "888888", "offline"});
+}
+
+void InsertNUsers(int n) {
+  for (int i = 0; i < n; ++i) InsertOneUser(i);
+}
+
 int main() {
-  User user = UserModel::Query(23);
-  printf("name=%s, password=%s, state=%s\n", user.name().c_str(),
-         user.password().c_str(), user.state().c_str());
-  user = UserModel::Query("zhang san");
-  printf("name=%s, password=%s, state=%s\n", user.name().c_str(),
-         user.password().c_str(), user.state().c_str());
+  // 
+  InsertNUsers(10000);
 }

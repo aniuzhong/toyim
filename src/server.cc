@@ -61,7 +61,7 @@ ImServer::ImServer(EventLoop* loop, const InetAddress& listenAddr)
       std::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
 }
 
-void ImServer::SetThreadNum(int n) { server_.setThreadNum(0); }
+void ImServer::SetThreadNum(int n) { server_.setThreadNum(n); }
 
 void ImServer::Start() { server_.start(); }
 
@@ -124,6 +124,7 @@ void ImServer::OnLogin(const TcpConnectionPtr& conn, const LoginPtr& message,
     // Wrong password or invalid user id.
     answer.set_reply("Failed to login.");
     codec_.send(conn, answer);
+    conn->shutdown();
   }
 }
 
@@ -182,7 +183,6 @@ void ImServer::OnCreateGroup(const muduo::net::TcpConnectionPtr& conn,
 void ImServer::OnAddGroup(const muduo::net::TcpConnectionPtr& conn,
                           const AddGroupPtr& message, muduo::Timestamp) {
   Answer answer;
-  // (groupid, userid) should be composite key of groupuser.
   GroupModel::AddGroup(message->user_id(), message->group_id(), "normal");
   answer.set_reply("AddGroup successfulily.");
   codec_.send(conn, answer);
