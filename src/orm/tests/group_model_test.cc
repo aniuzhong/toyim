@@ -39,8 +39,8 @@ void CreateGroup(const std::string& group_name, const std::string& group_desc) {
 
 int main() {
   // CreateGroup("Bench", "Group for Benchmark.");
-  // for (int i = 16037; i <= 26036; ++i) {
-  //   AddGroup(i, 4);
+  // for (int i = 7022; i <= 12021; ++i) {
+  //   AddGroup(i, 3);
   // }
-  QueryGroupUsers(16037, 4);
+  QueryGroupUsers(7022, 3);
 }

@@ -16,5 +16,5 @@ void InsertNUsers(int n) {
 
 int main() {
   // 
-  InsertNUsers(10000);
+  InsertNUsers(5000);
 }

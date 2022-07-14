@@ -12,7 +12,7 @@ target_link_libraries(toyim_proto protobuf pthread)
 
 add_executable(im_server server.cc)
 set_target_properties(im_server PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
-target_link_libraries(im_server protobuf_codec toyim_proto toyim_orm)
+target_link_libraries(im_server protobuf_codec toyim_proto toyim_orm toyim_hiredis)
 
 add_executable(im_client client.cc)
 set_target_properties(im_client PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")

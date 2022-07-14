@@ -1,12 +1,15 @@
 #ifndef TOYIM_IMSERVER_H
 #define TOYIM_IMSERVER_H
 
+#include <muduo/base/ThreadPool.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/TcpServer.h>
+#include <sw/redis++/redis++.h>
 
 #include <boost/noncopyable.hpp>
 #include <map>
 
+#include "hiredis/redis.h"
 #include "protobuf/codec.h"
 #include "protobuf/dispatcher.h"
 #include "toyim.pb.h"
@@ -42,17 +45,20 @@ class ImServer : public boost::noncopyable {
   void OnCreateGroup(const muduo::net::TcpConnectionPtr& conn,
                      const CreateGroupPtr& message, muduo::Timestamp);
   void OnAddGroup(const muduo::net::TcpConnectionPtr& conn,
-                     const AddGroupPtr& message, muduo::Timestamp);
+                  const AddGroupPtr& message, muduo::Timestamp);
   void OnGroupChat(const muduo::net::TcpConnectionPtr& conn,
                    const GroupChatPtr& message, muduo::Timestamp);
 
  private:
+  void OnSubscribeMessage(int user_id, std::string message);
+
   typedef std::map<int, muduo::net::TcpConnectionPtr> ConnectionMap;
   muduo::MutexLock mutex_;
   muduo::net::TcpServer server_;
   ProtobufDispatcher dispatcher_;
   ProtobufCodec codec_;
   ConnectionMap connections_ GUARDED_BY(mutex_);
+  Redis redis_;
 };
 
 #endif  // TOYIM_IMSERVER_H

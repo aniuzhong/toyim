@@ -1,0 +1,2 @@
+add_library(toyim_hiredis redis.cc)
+target_link_libraries(toyim_hiredis hiredis muduo_net muduo_base pthread)

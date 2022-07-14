@@ -1,6 +1,9 @@
 #include "server.h"
 
+#include <muduo/base/Exception.h>
 #include <muduo/base/Logging.h>
+
+#include <functional>
 
 #include "orm/friend_model.h"
 #include "orm/group_model.h"
@@ -59,11 +62,31 @@ ImServer::ImServer(EventLoop* loop, const InetAddress& listenAddr)
   server_.setConnectionCallback(std::bind(&ImServer::OnConnection, this, _1));
   server_.setMessageCallback(
       std::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
+
+  if (redis_.Connect()) {
+    redis_.init_notify_handler(
+        std::bind(&ImServer::OnSubscribeMessage, this, _1, _2));
+  }
+}
+
+void ImServer::OnSubscribeMessage(int user_id, std::string message) {
+  LOG_INFO << user_id << " " << message;
+  MutexLockGuard lock(mutex_);
+  auto it = connections_.find(user_id);
+  if (it != connections_.end()) {
+    Answer answer;
+    answer.set_reply(message);
+    codec_.send(it->second, answer);
+  }
+  // offlineMsgModel.insert(userid, msg);
 }
 
 void ImServer::SetThreadNum(int n) { server_.setThreadNum(n); }
 
-void ImServer::Start() { server_.start(); }
+void ImServer::Start() {
+  redis_.Subscribe(111);
+  server_.start();
+}
 
 void ImServer::OnConnection(const TcpConnectionPtr& conn) {
   LOG_INFO << conn->localAddress().toIpPort() << " -> "
@@ -109,8 +132,9 @@ void ImServer::OnLogin(const TcpConnectionPtr& conn, const LoginPtr& message,
         MutexLockGuard lock(mutex_);
         connections_[user.id()] = conn;
       }
-      // subscribe on redis
-      // ...
+      // subscribe user's on Redis
+      redis_.Subscribe(user.id());
+
       // Update user's state.
       user.set_state("online");
       UserModel::UpdateState(user);  // FIXME: error check
@@ -200,6 +224,11 @@ void ImServer::OnGroupChat(const muduo::net::TcpConnectionPtr& conn,
       answer.set_reply(message->content());
       codec_.send(it->second, answer);
     } else {
+      User user = UserModel::Query(id);
+      if (user.state() == "online") {
+        answer.set_reply(message->content());
+        redis_.Publish(user.id(), answer.reply());
+      }
       // TODO: Offline message.
     }
   }
@@ -213,6 +242,7 @@ int main(int argc, char* argv[]) {
     uint16_t port = static_cast<uint16_t>(atoi(argv[1]));
     InetAddress serverAddr(port);
     ImServer server(&loop, serverAddr);
+    server.SetThreadNum(0);
     server.Start();
     loop.loop();
   } else {
